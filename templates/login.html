@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{%block head%}
+<!-- REGISTRATION FORM -->
+<h2 style="text-align: center;padding: 10px;">Login</h2>
+{%endblock%}
+{%block reg%}
+<!-- Main Form -->
+<div class="login-form-1">
+    <form id="login-form" class="text-left">
+        <div class="login-form-main-message"></div>
+        <div class="main-login-form">
+            <div class="login-group">
+                <div class="form-group">
+                    <label for="lg_username" class="sr-only">Username</label>
+                    <input type="text" class="form-control" id="lg_username" name="lg_username" placeholder="username">
+                </div>
+                <div class="form-group">
+                    <label for="lg_password" class="sr-only">Password</label>
+                    <input type="password" class="form-control" id="lg_password" name="lg_password" placeholder="password">
+                </div>
+            </div>
+            <div style="text-align: center; padding-bottom: 15px;">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </div>
+        <div class="etc-login-form" style="text-align: center;">
+            <p>forgot your password? <a href="{{ url_for('forgot') }}">click here</a></p>
+            <p>new user? <a href="{{ url_for('start') }}">create new account</a></p>
+        </div>
+    </form>
+</div>
+
+    
+{%endblock%}
