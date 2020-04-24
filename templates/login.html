@@ -1,12 +1,9 @@
 {% extends "layout.html" %}
-{%block head%}
-<!-- REGISTRATION FORM -->
-<h2 style="text-align: center;padding: 10px;">Login</h2>
-{%endblock%}
 {%block reg%}
 <!-- Main Form -->
+<h2 style="text-align: center;padding: 10px;">Login</h2>
 <div class="login-form-1">
-    <form id="login-form" class="text-left">
+    <form id="login-form" class="text-left"  action="{{url_for('login')}}" method="POST">
         <div class="login-form-main-message"></div>
         <div class="main-login-form">
             <div class="login-group">
