@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, session, render_template, request, flash
+from flask import Flask, session, render_template, request, flash, redirect
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -8,6 +8,10 @@ import secrets
 import requests
 import pprint
 import psycopg2
+from extra import RegistrationForm
+from flask_wtf import FlaskForm
+from wtforms import Form, BooleanField, StringField, PasswordField, validators
+from werkzeug import generate_password_hash
 
 app = Flask(__name__)
 
@@ -22,45 +26,60 @@ Session(app)
 
 # Set up database
 engine = create_engine(os.getenv("DATABASE_URL"))
-db = scoped_session(sessionmaker(bind=engine))
+s = scoped_session(sessionmaker(bind=engine))
+db = s()
 
-table = db.execute("SELECT * FROM users")
-db.commit() 
+# Session
+# session["logged_in"] = True/False
+# session["user_id"] = user_id
+# session["user_name"] = username
 
-pprint.pprint(table)
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def start():
-    if not session.get("logged_in"):
-        return render_template("welcome.html")
+    print(request.form)
+    print(request.method)
+    form = RegistrationForm(request.form)
+    if session.get("logged_user") is None:
+        # No stored session needs to log in
+        return render_template("welcome.html", form=form)
     else:
-        return render_template("index.html", username=session["user_name"])
+        #User already logged in should be directed to homepage
+        return render_template("index.html", username=session.get("user_name"))
 
-@app.route("/registration", methods=["POST"])
+@app.route("/registration", methods=["GET", "POST"])
 def reg():
     if request.method == "POST":
-        users = db.execute("SELECT name, email FROM users")
-        for user in users:
-            if user.name == request.form.get("reg_username"):
-                return "Sorry username taken"
-            elif user.email == request.form.get("reg_email"):
-                return "Email already assign to an account"
+        form = RegistrationForm(request.form)
+        if form.validate():
+            if not db.execute("SELECT name FROM users WHERE name=:name", {"name":form.name.data}):
+                return render_template("login_error.html", error_msg="Sorry username taken")
+            elif not db.execute("SELECT email FROM users WHERE email=:email", {"email":form.email.data}):
+                return render_template("login_error.html", error_msg="Email already assign to an account")
             else: 
-                u_name = request.form.get("reg_username")
-                pw = request.form.get("reg_password")
-                email = request.form.get("reg_email")
                 db.execute("INSERT INTO users (name, password, email) VALUES (:name, :pw, :email)", 
-                {"name":u_name, "pw":pw , "email":email})
+                {"name":form.name.data, "pw":generate_password_hash(form.password.data),
+                "email":form.email.data})
                 db.commit()
-                return render_template("reg.html")
-    else:
-        return render_template("index.html")
+                flash("SUCCESS!")
+                return redirect(url_for('login')
+        else:
+            return render_template("login_error.html", error_msg = "Form isn't validated, contact page-admin.")
+    else: 
+        form = RegistrationForm(request.form)
+        return render_template("welcome.html", form=form)
 
+
+
+        
 @app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
         users = db.execute("SELECT name, password FROM users WHERE ")
-        return start()
+        session["logged_in"] = True
+        session["user_id"] = users.id
+        session["user_name"] = users.name
+        return redirect(url_for('start')
     else: 
         return render_template("login.html")
 
