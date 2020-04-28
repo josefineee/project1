@@ -8,7 +8,7 @@ import secrets
 import requests
 import pprint
 import psycopg2
-from extra import RegistrationForm
+from extra import RegistrationForm, LoginForm
 from flask_wtf import FlaskForm
 from wtforms import Form, BooleanField, StringField, PasswordField, validators
 from werkzeug import generate_password_hash
@@ -62,7 +62,7 @@ def reg():
                 "email":form.email.data})
                 db.commit()
                 flash("SUCCESS!")
-                return redirect(url_for('login')
+                return redirect(url_for('login'))
         else:
             return render_template("login_error.html", error_msg = "Form isn't validated, contact page-admin.")
     else: 
@@ -74,14 +74,18 @@ def reg():
         
 @app.route("/login", methods=["POST", "GET"])
 def login():
-    if request.method == "POST":
-        users = db.execute("SELECT name, password FROM users WHERE ")
-        session["logged_in"] = True
-        session["user_id"] = users.id
-        session["user_name"] = users.name
-        return redirect(url_for('start')
+    form=LoginForm(request.form)
+    if request.method == "POST" and form.validate:
+        users = db.execute("SELECT name, password FROM users WHERE name=:name", {"name":form.name.data})
+        if users is None:
+            return redirect(url_for('login'))
+        #if check_password_hash(users.password): 
+            #session["logged_in"] = True
+           # session["user_id"] = users.id
+           #  session["user_name"] = users.name
+           # return redirect(url_for('start')
     else: 
-        return render_template("login.html")
+        return render_template("login.html", form=form)
 
 @app.route("/forgot")
 def forgot():

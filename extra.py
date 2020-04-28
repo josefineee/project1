@@ -20,3 +20,14 @@ class RegistrationForm(Form):
     confirm = PasswordField('Repeat Password', id="reg_password_confirm")
     
     accept_tos = BooleanField('I accept the TOS', [validators.DataRequired()], id="reg_agree")
+
+class LoginForm(Form):
+    """Contact form."""
+    name = StringField('Username', [
+        validators.DataRequired(message="You need to provide a username")], 
+        id="reg_username")
+    
+
+    password = PasswordField('Password', [
+        validators.DataRequired(),
+        ], id="reg_password")
