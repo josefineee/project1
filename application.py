@@ -32,10 +32,16 @@ engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 # db = s()
 
+ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 # Session
 # session["logged_in"] = True/False
 # session["user_id"] = user_id
 # session["user_name"] = username
+
+def dir_last_updated(folder):
+    return str(max((os.path.getmtime(os.path.join(ROOT_PATH, f))
+                   for ROOT_PATH, dirs, files in os.walk(folder)
+                   for f in files), default=0))
 
 
 @app.route("/", methods=["GET"])
@@ -46,7 +52,7 @@ def start():
         return render_template("welcome.html", form=form)
     else:
         #User already logged in should be directed to homepage
-        return render_template("index.html", username=session.get("user_name"))
+        return render_template("index.html", username=session.get("user_name"), last_updated=dir_last_updated('project1/static'))
 
 @app.route("/registration", methods=["GET", "POST"])
 def reg():
@@ -73,22 +79,19 @@ def reg():
 def login():
     form=LoginForm()
     if form.validate_on_submit():
-        res = db.execute("SELECT password,id FROM users WHERE name=:name", {"name":form.name.data}).fetchone()
-        # check_pw = check_password_hash(res("password"), form.password.data)
-        # print(check_pw)
-        #user_id = res["id"]
-        #print(db_hash)
-        # print(users("name"))
-        if db.execute("SELECT name FROM users WHERE name=:name", {"name":form.name.data}).fetchone() is None:
+        res = db.execute("SELECT password,id, name FROM users WHERE name=:name", {"name":form.name.data}).fetchone()
+        
+        if res == None:
             flash("The username doesn't exsist")
             return redirect(url_for('login'))
         
-        # elif check_pw is False:
-        #     flash("Wrong password")
-        #     return redirect(url_for('login'))
+        check_pw = check_password_hash(res.password, form.password.data)
+        if check_pw is False:
+            flash("Wrong password")
+            return redirect(url_for('login'))
         else:
             session["logged_in"] = True
-            #session["user_id"] = users.id
+            session["user_id"] = res.id
             session["user_name"] = form.name.data
             return redirect(url_for('start'))
     else:
