@@ -1,33 +1,59 @@
 {% extends "layout.html" %}
 {%block reg%}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for message in messages %}
+            {% if "doesn't exsist" in message[1]: %}
+                        <div class="alert alert-danger">
+                        <strong>Error: </strong> {{ message[1] }}
+                        </div>
+            {% endif %}
+            {% if "Wrong" in message[1]: %}
+                        <div class="alert alert-danger">
+                        <strong>Error: </strong> {{ message[1] }}
+                        </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
 <!-- Main Form -->
-<h2 style="text-align: center;padding: 10px;">Login</h2>
-<div class="login-form-1">
-    <form id="login-form" class="text-left"  action="{{url_for('login')}}" method="POST">
-        <div class="login-form-main-message"></div>
-        <div class="main-login-form">
-            <div class="login-group">
-                <div class="form-group">
-                    {{ form.name(class_="form-control") }}
-                    
-                    
-                    <!-- <label for="lg_username" class="sr-only">Username</label>
-                    <input type="text" class="form-control" id="lg_username" name="lg_username" placeholder="username"> -->
+<div class="formbackground">
+    <h2 style="text-align: center;padding: 10px;">Login</h2>
+    <div class="login-form-1">
+        <form id="login-form" class="text-left"  action="" method="POST" role="form">
+            {{ form.csrf }}
+            <div class="login-form-main-message"></div>
+            <div class="main-login-form">
+                <div class="login-group">
+                    <div class="form-group">
+                        {{ form.name.label(class_="sr-only")}}
+                        {{ form.name(class_="form-control", placeholder="Username") }}
+                        {% for error in form.name.errors %}
+                        <span style="color: red;">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.password.label(class_="sr-only")}}
+                        {{ form.password(class_="form-control", placeholder="Password") }}
+                        {% if form.password.errors %}
+                            {% for error in form.password.errors %}
+                            <span style="color: red;">{{ error }}</span><br>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="lg_password" class="sr-only">Password</label>
-                    <input type="password" class="form-control" id="lg_password" name="lg_password" placeholder="password">
+                <div style="text-align: center; padding-bottom: 15px;">
+                    <button type="submit" class="btn btn-primary">Login</button>
                 </div>
             </div>
-            <div style="text-align: center; padding-bottom: 15px;">
-                <button type="submit" class="btn btn-primary">Login</button>
+        
+            <div class="etc-login-form" style="text-align: center;">
+                <p>forgot your password? <a href="{{ url_for('forgot') }}">click here</a></p>
+                <p>new user? <a href="{{ url_for('start') }}">create new account</a></p>
             </div>
-        </div>
-        <div class="etc-login-form" style="text-align: center;">
-            <p>forgot your password? <a href="{{ url_for('forgot') }}">click here</a></p>
-            <p>new user? <a href="{{ url_for('start') }}">create new account</a></p>
-        </div>
-    </form>
+        </form>
+    </div> 
 </div>
 
     

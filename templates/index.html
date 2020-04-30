@@ -1,4 +1,19 @@
 {% extends "layout.html" %}
+{%block nav%}
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Hi, {{username}}
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('logout') }}">Log out</a>
+              <a class="dropdown-item" href="#">Another action</a>
+            </div>
+    </ul>
+</div>
+{%endblock%}
+
 {%block reg%}
     <h2 style="text-align: center;padding: 10px;">Welcome</h2>
     <div class="container" style="max-width: 400px; align-content: center;">
