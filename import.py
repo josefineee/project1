@@ -14,11 +14,12 @@ db = scoped_session(sessionmaker(bind=engine))
 def main():
     fil = open("books.csv")
     read = csv.reader(fil)
+    next(read, None)
     for isbn, title, author, year in read: 
-        year =int(year)
+        year = int(year)
         db.execute("INSERT INTO books(isbn, title, author, year) VALUES (:i, :t, :a, :y)", 
         {"i":isbn, "t":title, "a":author, "y":year})
-        db.commit()
+    db.commit()
 
 if __name__ == "__main__":
     if not engine.dialect.has_table(db,"books"): 
