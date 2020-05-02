@@ -15,10 +15,42 @@
 {%endblock%}
 
 {%block reg%}
-    <h2 style="text-align: center;padding: 10px;">Welcome</h2>
+<h2 style="text-align: center;padding: 10px;">Welcome</h2>
     <div class="container" style="max-width: 400px; align-content: center;">
-        <div class="login-form-1">
-
+        <!-- <div class="login-form-1"> -->
+        <!-- Search form -->
+        <!-- <input class="form-control" type="text" placeholder="Search" aria-label="Search"> -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="input-group" id="adv-search">
+                    <input type="text" class="form-control" placeholder="Search book" />
+                    <!-- <div class="input-group-btn"> -->
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                        </div>
+                    <div class="dropdown dropdown-lg">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></button>
+                        <div class="dropdown-menu dropdown-menu-right" role="menu">
+                            <form class="form-horizontal" role="form">
+                                <div class="form-group">
+                                    <label for="contain">Isbn</label>
+                                    <input class="form-control" type="text" />
+                                </div>
+                                <div class="form-group">
+                                <label for="contain">Author</label>
+                                <input class="form-control" type="text" />
+                                </div>
+                                <div class="form-group">
+                                <label for="contain">Contains the words</label>
+                                <input class="form-control" type="text" />
+                                </div>
+                                <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
     </div>
-
 {%endblock%}
