@@ -44,15 +44,33 @@ def dir_last_updated(folder):
                    for f in files), default=0))
 
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["GET", "POST"])
 def start():
     form = RegistrationForm(request.form)
-    if session.get("logged_in") is not True:
-        # No stored session needs to log in
-        return render_template("welcome.html", form=form)
+    if request.method == "GET":
+        if session.get("logged_in") is not True:
+            # No stored session needs to log in
+            return render_template("welcome.html", form=form)
+        else:
+            #User already logged in should be directed to homepage
+            return render_template("index.html", username=session.get("user_name"), last_updated=dir_last_updated('project1/static'))
     else:
-        #User already logged in should be directed to homepage
-        return render_template("index.html", username=session.get("user_name"), last_updated=dir_last_updated('project1/static'))
+        search= {"freetext": request.form.get("free-text"), 
+                "title": request.form.get("book-title"), 
+                "author":request.form.get("book-author"),
+                "isbn" : request.form.get("books-isbn"),
+                "year" :request.form.get("publish-year")}
+
+        print(search)
+        # for k in search.copy():
+        #     if search[k] is None:
+        #         del search[k]
+        
+        # print(search)
+        results = db.execute("SELECT * FROM books WHERE isbn=:i OR title=:t OR author=:a OR year=:y",
+                    {"isbn":search["isbn"], "title":search["title"], 
+                    "author":search["author"], "year":search["year"]})
+        return render_template("search.html", results=results)
 
 @app.route("/registration", methods=["GET", "POST"])
 def reg():

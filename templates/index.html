@@ -15,27 +15,43 @@
 {%endblock%}
 
 {%block reg%}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for message in messages %}
+            {% if "New account" in message[1]: %}
+                <div class="alert alert-info">
+                <strong>Success! </strong> {{ message[1] }}
+                </div>
+            {% endif %}
+            {% if "searched" in message[1]: %}
+                <div class="alert alert-danger">
+                <strong>Error: </strong> {{ message[1] }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 <section>
     <h2 style="text-align: center;padding: 10px;">Welcome</h2>
-    <form>
-        <input type="text" class="form-control" placeholder="Which book are you searching for?" aria-label="book search" aria-describedby="basic-addon2">
+    <form id="search-form"  action="" method="POST" role="form">
+        <input type="text" name="free-text" class="form-control" placeholder="Which book are you searching for?" aria-label="book search" aria-describedby="basic-addon2">
             <label id="advanced-button" data-toggle="collapse" data-target="#advanced-serach"> Advanced search</label>
             <div id="advanced-serach" class="collapse">
                 <div class="form-group">
-                    <input class="form-control" type="text" placeholder="Title" />
+                    <input class="form-control" id="book-title" type="text" placeholder="Title" />
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" placeholder="Author"/>
+                    <input class="form-control" id="book-author" type="text" placeholder="Author"/>
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" placeholder="ISBN" />
+                    <input class="form-control" id="books-isbn" type="text" placeholder="ISBN" />
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" placeholder="Publishing Year"/>
+                    <input class="form-control" id="publish-year" type="text" placeholder="Publishing Year"/>
                 </div>
             </div>
         <div class="input-group-append search-wrapper">
-            <button class="btn btn-primary fa fa-search col-sm-3" type="button"></button>
+            <button class="btn btn-primary fa fa-search col-sm-3" type="submit"></button>
         </div>
     </form>
 </section>
