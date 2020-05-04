@@ -1,4 +1,5 @@
 import os
+import datetime
 from flask import Flask, session, render_template, request, flash, redirect, url_for
 from flask_session import Session
 from sqlalchemy import create_engine
@@ -19,8 +20,11 @@ if not os.getenv("DATABASE_URL"):
     raise RuntimeError("DATABASE_URL is not set")
 
 # Configure session to use filesystem
-app.config["SESSION_PERMANENT"] = False
+SECRET_KEY = os.urandom(32)
+app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "filesystem"
+app.config["PERMANENT_SESSION_LIFETIME"] = datetime.timedelta(minutes=5)
+app.config['SECRET_KEY'] = SECRET_KEY
 Session(app)
 
 # Configure CSRF 
@@ -53,6 +57,7 @@ def start():
             return render_template("welcome.html", form=form)
         else:
             #User already logged in should be directed to homepage
+
             return render_template("index.html", username=session.get("user_name"), last_updated=dir_last_updated('project1/static'))
     else:
         search= {"freetext": request.form.get("free-text"), 
@@ -70,7 +75,7 @@ def start():
         results = db.execute("SELECT * FROM books WHERE isbn=:i OR title=:t OR author=:a OR year=:y",
                     {"isbn":search["isbn"], "title":search["title"], 
                     "author":search["author"], "year":search["year"]})
-        return render_template("search.html", results=results)
+        return render_template("search.html", results=results, username=session.get("user_name"))
 
 @app.route("/registration", methods=["GET", "POST"])
 def reg():
@@ -124,6 +129,9 @@ def logout():
 def forgot():
     return render_template("forgot.html")
 
+@app.route("/mypages<session.get('user_name')>")
+def mypages():
+    return render_template("mypages.html")
 
           # hash_pw = check_password_hash(form.password.data)
         # pw_db = generate_password_hash(form.password.data)
