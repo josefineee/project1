@@ -1,60 +1,48 @@
-{% extends "layout.html" %}
-{%block nav%}
-<div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-        <li class="nav-item dropdown">
-            <a class="nav-link font_size dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Hi, {{username}}
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="{{ url_for('logout') }}">Log out</a>
-              <a class="dropdown-item" href="#">Another action</a>
-            </div>
-    </ul>
-</div>
-{%endblock%}
+{% extends "layout2.html" %}
 
 {%block reg%}
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for message in messages %}
-            {% if "New account" in message[1]: %}
-                <div class="alert alert-info">
-                <strong>Success! </strong> {{ message[1] }}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for message in messages %}
+                {% if "New account" in message[1]: %}
+                    <div class="alert alert-info">
+                    <strong>Success! </strong> {{ message[1] }}
+                    </div>
+                {% endif %}
+                {% if "searched" in message[1]: %}
+                    <div class="alert alert-danger">
+                    <strong>Error: </strong> {{ message[1] }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <div class="container" style="max-width: 400px; align-content: center;text-align: center;">
+        <section id="search_section">
+            <h2 style="text-align: center;padding: 10px;">Which book are you searching for?</h2>
+            <form id="search-form"  action="" method="POST" role="form">
+                <input type="text" name="free-text" class="form-control" placeholder="Free-text search" aria-label="book search" aria-describedby="basic-addon2">
+                    <label id="advanced-button" data-toggle="collapse" data-target="#advanced-search"> Advanced search</label>
+                    <div id="advanced-search" class="collapse">
+                        <div class="form-group">
+                            <input class="form-control" name="book-title" type="text" placeholder="Title" />
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control" name="book-author" type="text" placeholder="Author"/>
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control" name="books-isbn" type="text" placeholder="ISBN" />
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control" name="publish-year" type="text" placeholder="Publishing Year"/>
+                        </div>
+                    </div>
+                <div class="input-group-append search-wrapper">
+                    <button class="btn btn-primary fa fa-search col-sm-3" style="align-content: center !important;"type="submit"></button>
                 </div>
-            {% endif %}
-            {% if "searched" in message[1]: %}
-                <div class="alert alert-danger">
-                <strong>Error: </strong> {{ message[1] }}
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-<section>
-    <h2 style="text-align: center;padding: 10px;">Welcome</h2>
-    <form id="search-form"  action="" method="POST" role="form">
-        <input type="text" name="free-text" class="form-control" placeholder="Which book are you searching for?" aria-label="book search" aria-describedby="basic-addon2">
-            <label id="advanced-button" data-toggle="collapse" data-target="#advanced-serach"> Advanced search</label>
-            <div id="advanced-serach" class="collapse">
-                <div class="form-group">
-                    <input class="form-control" id="book-title" type="text" placeholder="Title" />
-                </div>
-                <div class="form-group">
-                    <input class="form-control" id="book-author" type="text" placeholder="Author"/>
-                </div>
-                <div class="form-group">
-                    <input class="form-control" id="books-isbn" type="text" placeholder="ISBN" />
-                </div>
-                <div class="form-group">
-                    <input class="form-control" id="publish-year" type="text" placeholder="Publishing Year"/>
-                </div>
-            </div>
-        <div class="input-group-append search-wrapper">
-            <button class="btn btn-primary fa fa-search col-sm-3" type="submit"></button>
-        </div>
-    </form>
-</section>
+            </form>
+        </section>
+    </div>
 {%endblock%}
 
 

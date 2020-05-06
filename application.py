@@ -54,28 +54,27 @@ def start():
     if request.method == "GET":
         if session.get("logged_in") is not True:
             # No stored session needs to log in
-            return render_template("welcome.html", form=form)
+            return render_template("welcome.html", form=form, last_updated=dir_last_updated('project1/static'))
         else:
             #User already logged in should be directed to homepage
 
             return render_template("index.html", username=session.get("user_name"), last_updated=dir_last_updated('project1/static'))
     else:
-        search= {"freetext": request.form.get("free-text"), 
-                "title": request.form.get("book-title"), 
-                "author":request.form.get("book-author"),
-                "isbn" : request.form.get("books-isbn"),
-                "year" :request.form.get("publish-year")}
-
-        print(search)
-        # for k in search.copy():
-        #     if search[k] is None:
-        #         del search[k]
-        
-        # print(search)
-        results = db.execute("SELECT * FROM books WHERE isbn=:i OR title=:t OR author=:a OR year=:y",
-                    {"isbn":search["isbn"], "title":search["title"], 
-                    "author":search["author"], "year":search["year"]})
-        return render_template("search.html", results=results, username=session.get("user_name"))
+        q = ""
+        if request.form.get("books-isbn") not in [None, ""]:
+            q = "AND isbn LIKE :i "
+        if request.form.get("book-title") not in [None, ""]:
+            q += "AND title LIKE :t "
+        if request.form.get("book-author") not in [None, ""]:
+            q += "AND author LIKE :a "
+        if request.form.get("publish-year") not in [None, ""]:
+            q += "AND year LIKE :y"
+        print("SELECT * FROM books WHERE (isbn LIKE :f OR title LIKE :f OR author LIKE :f OR year LIKE :f) {}".format(q))
+        results = db.execute("SELECT * FROM books WHERE isbn LIKE :f OR title LIKE :f OR author LIKE :f OR year LIKE :f {}".format(q),
+                            {"i":('%'+ request.form.get("books-isbn")+'%'), "t":('%'+ request.form.get("book-title")+ '%'), "a":('%' + request.form.get("book-author") + '%'), "y":('%' + request.form.get("publish-year") + '%'), "f":('%' + request.form.get("free-text")+ '%')})
+        if results is None:
+            return redirect(url_for('mypages', username=session.get("user_name")))
+        return render_template("search.html", results=results, username=session.get("user_name"), last_updated=dir_last_updated('project1/static'))
 
 @app.route("/registration", methods=["GET", "POST"])
 def reg():
@@ -95,7 +94,7 @@ def reg():
             flash("New account registred please log in to access BookReads.")
             return redirect(url_for('login'))
     else: 
-        return render_template("welcome.html", form=form)
+        return render_template("welcome.html", form=form,clast_updated=dir_last_updated('project1/static'))
 
         
 @app.route("/login", methods=["POST", "GET"])
@@ -118,7 +117,7 @@ def login():
             session["user_name"] = form.name.data
             return redirect(url_for('start'))
     else:
-        return render_template("login.html", form=form)
+        return render_template("login.html", form=form, last_updated=dir_last_updated('project1/static'))
 
 @app.route("/logout")
 def logout():
@@ -129,10 +128,15 @@ def logout():
 def forgot():
     return render_template("forgot.html")
 
-@app.route("/mypages<session.get('user_name')>")
-def mypages():
-    return render_template("mypages.html")
+@app.route("/mypages/<username>")
+def mypages(username):
+    return render_template("mypages.html", username=session["user_name"], last_updated=dir_last_updated('project1/static'))
 
-          # hash_pw = check_password_hash(form.password.data)
-        # pw_db = generate_password_hash(form.password.data)
-        #if check_password_hash(users.password)
+@app.route("/book/<bookid>")
+def book(bookid):
+    book = db.execute("SELECT * FROM books WHERE id=:id", {"id":bookid}).fetchone()
+    return render_template("book.html", bookid=book.id, book=book, username=session["user_name"], last_updated=dir_last_updated('project1/static'))
+
+@app.route("/static/pictures/book3.jpg")
+def get_img():
+   return app.send_static_file("http://127.0.0.1/8080/static/pictures/book3.jpg")
